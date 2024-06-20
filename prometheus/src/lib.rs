@@ -8,9 +8,15 @@ mod utils;
 use banks_with_commitments::BanksWithCommitments;
 use identity_info::{map_vote_identity_to_info, IdentityInfoMap};
 use solana_gossip::cluster_info::ClusterInfo;
-use solana_runtime::{bank_forks::BankForks, commitment::BlockCommitmentCache, snapshot_config::SnapshotConfig};
+use solana_runtime::{
+    bank_forks::BankForks, commitment::BlockCommitmentCache, snapshot_config::SnapshotConfig,
+};
 use solana_sdk::pubkey::Pubkey;
-use std::{collections::HashSet, sync::{Arc, RwLock}, thread};
+use std::{
+    collections::HashSet,
+    sync::{Arc, RwLock},
+    thread,
+};
 
 #[derive(Clone, Copy)]
 pub struct Lamports(pub u64);
@@ -51,15 +57,17 @@ impl PrometheusMetrics {
         thread::spawn(move || {
             // TODO: This can panic, we should handle it better
             let identity_info_map = map_vote_identity_to_info(&bank_forks, &vote_accounts);
-            prom_metrics_clone.identity_info_map.write().unwrap().replace(identity_info_map);
+            prom_metrics_clone
+                .identity_info_map
+                .write()
+                .unwrap()
+                .replace(identity_info_map);
         });
-        
+
         prom_metrics
     }
 
-    pub fn render_prometheus(
-        &self,
-    ) -> Vec<u8> {
+    pub fn render_prometheus(&self) -> Vec<u8> {
         let banks_with_comm =
             BanksWithCommitments::new(&self.bank_forks, &self.block_commitment_cache);
 
@@ -71,7 +79,7 @@ impl PrometheusMetrics {
         // - processed: most recent block.
         let mut out: Vec<u8> = Vec::new();
         bank_metrics::write_bank_metrics(&banks_with_comm, &mut out).expect("IO error");
-    
+
         cluster_metrics::write_node_metrics(&banks_with_comm, &self.cluster_info, &mut out)
             .expect("IO error");
 
@@ -91,6 +99,4 @@ impl PrometheusMetrics {
         }
         out
     }
-    
-
 }

@@ -38,8 +38,7 @@ use {
     },
     solana_sdk::{
         exit::Exit, genesis_config::DEFAULT_GENESIS_DOWNLOAD_PATH, hash::Hash,
-        native_token::lamports_to_sol,
-        pubkey::Pubkey,
+        native_token::lamports_to_sol, pubkey::Pubkey,
     },
     solana_send_transaction_service::send_transaction_service::{self, SendTransactionService},
     solana_storage_bigtable::CredentialType,
@@ -87,7 +86,6 @@ impl RpcRequestMiddleware {
         health: Arc<RpcHealth>,
         prometheus_metrics: Option<Arc<PrometheusMetrics>>,
     ) -> Self {
-        
         Self {
             ledger_path,
             full_snapshot_archive_path_regex: Regex::new(
